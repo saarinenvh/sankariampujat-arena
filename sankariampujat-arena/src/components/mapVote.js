@@ -68,7 +68,7 @@ class MapVote extends React.Component {
     const newState = this.state
     const keys = Object.keys(newState)
     keys.forEach(n => newState[n] = 0)
-    this.postToBackEndApi("/updateVotes", newState)
+    this.postToBackEndApi("/api/updateVotes", newState)
   }
 
   render() {
