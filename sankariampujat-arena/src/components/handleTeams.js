@@ -17,7 +17,7 @@ class HandleTeams extends React.Component {
 
   componentDidMount() {
       // Call our fetch function below once the component mounts
-    this.getFromBackEndAPI('/getState')
+    this.getFromBackEndAPI('/api/getState')
       .then(res => this.setState(res), () => { console.log(this.state)})
       .catch(err => console.log(err));
   }
@@ -49,7 +49,7 @@ class HandleTeams extends React.Component {
     const newState = this.state
     newState.playerPool = pool
     team === 1 ? newState.team1.push(player) : newState.team2.push(player);
-    this.postToBackEndApi('/updateState', newState)
+    this.postToBackEndApi('/api/updateState', newState)
   }
 
   async deletePlayer(player) {
@@ -57,7 +57,7 @@ class HandleTeams extends React.Component {
     pool.splice(pool.findIndex(n => n.id === player.id), 1);
     const newState = this.state;
     newState.playerPool = pool;
-    this.postToBackEndApi('/updateState', newState)
+    this.postToBackEndApi('/api/updateState', newState)
   }
 
   createNewPlayer() {
@@ -70,7 +70,7 @@ class HandleTeams extends React.Component {
     pool.push(player);
     const newState = this.state
     newState['playerPool'] = pool
-    await this.postToBackEndApi('/updateState', newState)
+    await this.postToBackEndApi('/api/updateState', newState)
     this.setState({newPlayer: ""})
   }
 
@@ -85,13 +85,13 @@ class HandleTeams extends React.Component {
     newState.playerPool = pool;
     newState.team1 = [];
     newState.team2 = [];
-    this.postToBackEndApi('/updateState', newState)
+    this.postToBackEndApi('/api/updateState', newState)
   }
 
   async removeAllPlayers() {
     const newState = this.state
     newState.playerPool = [];
-    this.postToBackEndApi('/updateState', newState)
+    this.postToBackEndApi('/api/updateState', newState)
   }
 
   randomizeTeams() {
@@ -115,7 +115,7 @@ class HandleTeams extends React.Component {
         }
       });
     newState.playerPool = [];
-    this.postToBackEndApi('/updateState', newState)
+    this.postToBackEndApi('/api/updateState', newState)
   }
 
   playerFromTeamToPool = async (e) => {
@@ -126,7 +126,7 @@ class HandleTeams extends React.Component {
     const index2 = newState.team2.findIndex(n => n.id === e.id)
     index1 !== -1 ? newState.team1.splice(index1,1) : newState.team2.splice(index2, 1)
     newState.playerPool = pool;
-    this.postToBackEndApi('/updateState', newState)
+    this.postToBackEndApi('/api/updateState', newState)
   };
 
   generatePlayerPool() {

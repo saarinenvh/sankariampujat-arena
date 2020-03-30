@@ -20,7 +20,7 @@ class MapVote extends React.Component {
   componentDidMount() {
     window.localStorage.clear()
       // Call our fetch function below once the component mounts
-    this.getFromBackEndAPI('/getVotes')
+    this.getFromBackEndAPI('/api/getVotes')
       .then(res => this.setState(res), () => { console.log(this.state)})
       .catch(err => console.log(err));
   }
@@ -61,7 +61,7 @@ class MapVote extends React.Component {
       window.localStorage.setItem('mapVote', map)
     }
 
-    this.postToBackEndApi("/updateVotes", newState)
+    this.postToBackEndApi("/api/updateVotes", newState)
   }
 
   async clearVotes() {
