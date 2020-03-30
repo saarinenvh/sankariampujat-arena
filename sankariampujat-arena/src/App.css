@@ -1,0 +1,60 @@
+body {
+  background-image: url(files/background.jpg);
+}
+
+h1,
+h5 {
+  font-family: "Spicy Rice", cursive;
+}
+
+.teamNumber {
+  font-family: "Spicy Rice", cursive;
+}
+
+.teamNumber:hover,
+.trash:hover {
+  color: lime;
+}
+
+.card h1,
+p {
+  color: black;
+}
+
+.main h1,
+h2,
+h3,
+h4 {
+  color: black;
+}
+
+#header {
+  color: lime;
+}
+
+.main {
+  background-color: #96a4e6;
+  opacity: 95%;
+  border-radius: 30px;
+  padding: 80px;
+}
+
+.link {
+  cursor: pointer;
+}
+
+.right {
+  float: right;
+}
+
+.mapThumbnail {
+  border: 3px solid green;
+  -webkit-box-shadow: 10px 10px 25px -12px rgba(0, 0, 0, 0.75);
+  -moz-box-shadow: 10px 10px 25px -12px rgba(0, 0, 0, 0.75);
+  box-shadow: 10px 10px 25px -12px rgba(0, 0, 0, 0.75);
+  cursor: pointer;
+}
+
+.mapThumbnail:hover {
+  border: 3px solid lime;
+}
