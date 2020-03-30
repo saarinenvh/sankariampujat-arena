@@ -1,7 +1,7 @@
 const express = require("express");
 const app = express();
 var bodyParser = require("body-parser");
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 5500;
 
 let state = { playerPool: [], team1: [], team2: [] };
 let votes = {
@@ -20,38 +20,33 @@ app.use(bodyParser.urlencoded({ extended: false }));
 // parse application/json
 app.use(bodyParser.json());
 
-app.get("/getVotes", (req, res) => {
+app.get("/api/getVotes", (req, res) => {
   res.send(votes);
 });
 
-app.post("/updateVotes", (req, res) => {
+app.post("/api/updateVotes", (req, res) => {
   votes = req.body;
   res.send(votes);
 });
 
-app.post("/updateState", (req, res) => {
+app.post("/api/updateState", (req, res) => {
   state = req.body;
   res.send(state);
 });
 
-app.post("/updateTeam1", (req, res) => {
+app.post("/api/updateTeam1", (req, res) => {
   this.state.team1 = req.data;
   res.send(state);
 });
 
-app.post("/updateTeam2", (req, res) => {
+app.post("/api/updateTeam2", (req, res) => {
   this.state.team1 = req.data;
   res.send(state);
 });
 
-app.get("/getState", (req, res) => {
+app.get("/api/getState", (req, res) => {
   res.send(state);
 });
 
 // console.log that your server is up and running
 app.listen(port, () => console.log(`Listening on port ${port}`));
-
-// create a GET route
-app.get("/express_backend", (req, res) => {
-  res.send({ express: "YOUR EXPRESS BACKEND IS CONNECTED TO REACT" });
-});
