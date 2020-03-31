@@ -26,10 +26,10 @@ let votes = {
 };
 
 let playerID;
-var io = require('socket.io').listen(server);
+const io = socketIo(server, {'force new connection': true });
 let interval;
 
-io.on("connection", socket => {
+io.sockets.on("connection", socket => {
   console.log("New client connected");
   if (interval) {
     clearInterval(interval);
@@ -42,8 +42,8 @@ io.on("connection", socket => {
 
 const getApiAndEmit = async socket => {
   try {
-      socket.emit("STATE", state); // Emitting a new message. It will be consumed by the client
-      socket.emit("VOTES", votes); // Emitting a new message. It will be consumed by the client
+      io.sockets.emit("STATE", state); // Emitting a new message. It will be consumed by the client
+      io.sockets.emit("VOTES", votes); // Emitting a new message. It will be consumed by the client
   } catch (error) {
     console.error(`Error: ${error.code}`);
   }

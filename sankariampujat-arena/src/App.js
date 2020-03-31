@@ -2,6 +2,7 @@ import React from "react";
 import HandleTeams from "./components/handleTeams";
 
 import "./App.css";
+require('dotenv').config()
 
 function App() {
   return (

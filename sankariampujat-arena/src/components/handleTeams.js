@@ -17,7 +17,7 @@ class HandleTeams extends React.Component {
       },
       votes: {},
       newPlayer: "",
-      endpoint: "http://localhost:5500"
+      endpoint: process.env.ENDPOINT
     };
   }
 
@@ -33,8 +33,8 @@ class HandleTeams extends React.Component {
 
   const { endpoint } = this.state;
   const socket = socketIOClient(endpoint);
-  socket.on("STATE", data => this.setState({serverData: data}, () => console.log("STATE dataa socketista")));
-  socket.on("VOTES", data => this.setState({votes: data}, () => console.log("Vote dataa socketista")));
+  socket.on("STATE", data => this.setState({serverData: data}));
+  socket.on("VOTES", data => this.setState({votes: data}));
 }
 
   getFromBackEndAPI = async (url) => {
@@ -195,7 +195,7 @@ class HandleTeams extends React.Component {
 
   handleSubmit(e) {
     e.preventDefault();
-    this.addPlayerToPool(e);
+    this.createNewPlayer()
   }
 
   render() {
