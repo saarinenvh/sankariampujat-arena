@@ -9,6 +9,7 @@ const mysql = require("mysql");
 const dotenv = require("dotenv");
 const session = require("express-session");
 const SteamStrategy = require("./lib/passport-steam").Strategy;
+dotenv.config();
 let Rcon = require("srcds-rcon");
 let rcon = Rcon({
   address: process.env.RCON_ADDRESS,
@@ -16,9 +17,8 @@ let rcon = Rcon({
 });
 
 var cors = require("cors");
-dotenv.config();
 
-let state = { playerPool: [], team1: [], team2: [] };
+let state = { praccMode: false, playerPool: [], team1: [], team2: [] };
 let votedto = {
   dust2: 0,
   inferno: 0,
@@ -254,6 +254,7 @@ function createMatch() {
 
 app.get("/api/startgame", (req, res) => {
   rcon.connect().then(() => {
+    console.log
     rcon.command("quit").then(console.log("RESTART SUCCESS"), console.error("RESTART FAILED"));
   });
 
@@ -261,9 +262,35 @@ app.get("/api/startgame", (req, res) => {
     rcon.connect().then(() => {
       rcon.command("get5_loadmatch_url 167.172.166.236/api/loagMatchConfig").then(console.log("MATCH CONFIG LOADED SUCCESFULLY"), console.error("ERROR LOADING MATCH CONFIG"));
     });
-  }, 5000);
+  }, 25000);
 
   res.send({ game: "started" });
+});
+
+app.get("/api/getPracMode", (res,req) =>  {
+  rcon.connect().then(() => {
+    rcon.command("get5_check_auths").then( auths => {
+      auths === 0 ? state.praccMode = false : state.praccMode = true
+    });
+  });
+  res.send(state.praccMode)
+});
+
+app.get("/api/togglePracMode", (res,req) =>  {
+  rcon.connect().then(() => {
+    rcon.command("get5_check_auths").then( auths => {
+      auths === 0 ? state.praccMode = false : state.praccMode = true
+    });
+  });
+
+  rcon.connect().then(() => {
+    newMode = state.praccMode === 0 ? 1 : 0
+    rcon.command(`get5_check_auths ${newMode}`).then( console.log("TOGGLED AUTH REQUIREMENTS")
+    });
+  });
+
+  state.praccMode = newMode === 1 ? true : false
+  res.send(state.praccMode)
 });
 
 app.get("/api/loadMatchConfig", (req, res) => {
