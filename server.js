@@ -261,6 +261,18 @@ app.get("/startgame", (req, res) => {
     rcon.command("quit");
   });
 
+  setTimeout(() => {
+    rcon.connect().then(() => {
+      rcon.command(
+        "get5_loadmatch_url http://167.172.166.236/api/getMatchConfig"
+      );
+    });
+  }, 5000);
+
+  res.send({ game: "started" });
+});
+
+app.get("/api/getMatchConfig", (req, res) => {
   const matchConfig = createMatch();
   res.send(matchConfig);
 });

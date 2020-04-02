@@ -170,6 +170,10 @@ class HandleTeams extends React.Component {
     this.postToBackEndApi("/api/updateState", newState);
   }
 
+  startGame() {
+    this.getFromBackEndAPI("/api/startGame");
+  }
+
   handleAuth() {
     this.getFromBackEndAPI("/auth/steam");
   }
@@ -349,6 +353,21 @@ class HandleTeams extends React.Component {
                 <div className="row  ml-2 mr-2">
                   <div className="col">
                     <MapVote key={uuidv4()} votes={this.state.votes}></MapVote>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="main mb-3">
+              <div className="mapVote">
+                <div className="row  ml-2 mr-2">
+                  <div className="col">
+                    <button
+                      className="btn btn-primary"
+                      onClick={() => this.startGame()}
+                    >
+                      Start Game!
+                    </button>
                   </div>
                 </div>
               </div>
