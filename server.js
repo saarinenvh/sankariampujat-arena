@@ -9,6 +9,12 @@ const mysql = require("mysql");
 const dotenv = require("dotenv");
 const session = require("express-session");
 const SteamStrategy = require("./lib/passport-steam").Strategy;
+let Rcon = require("srcds-rcon");
+let rcon = Rcon({
+  address: "suomi6.net9.fi",
+  password: "frisbee"
+});
+
 var cors = require("cors");
 dotenv.config();
 
@@ -203,4 +209,58 @@ app.get("/api/validateSession", (req, res) => {
   } else {
     res.send(undefined);
   }
+});
+
+function createTeamDTO(team) {
+  const teamDTO = {};
+  return team.map(n => {
+    teamDTO[n.id] = n.displayName;
+  });
+}
+
+function createMatch() {
+  const map =
+    "de_" +
+    Math.max.apply(
+      null,
+      Object.keys(votedto).map(function(key) {
+        return votedto[key];
+      })
+    );
+
+  const match = {
+    matchid: "SankariBattle",
+    num_maps: 1,
+    players_per_team: 5,
+    min_players_to_ready: 1,
+    min_spectators_to_ready: 0,
+    skip_veto: true,
+    side_type: "standard",
+    maplist: [map],
+
+    team1: {
+      name: "Team " + state.team1[0].displayName,
+      players: createTeamDTO(state.team1)
+    },
+
+    team2: {
+      name: "Team " + state.team2[0].displayName,
+      players: createTeamDTO(state.team2)
+    },
+
+    cvars: {
+      hostname: "SankariArena"
+    }
+  };
+
+  return matchConfig;
+}
+
+app.get("/startgame", (req, res) => {
+  rcon.connect().then(() => {
+    rcon.command("quit");
+  });
+
+  const matchConfig = createMatch();
+  res.send(matchConfig);
 });
