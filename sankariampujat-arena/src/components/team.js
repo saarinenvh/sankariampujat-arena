@@ -12,12 +12,6 @@ class Team extends React.Component {
 
   removePlayerFromTeam(player) {
     this.props.parentCallback(player);
-    // this.props.players.splice(
-    //   this.props.players.findIndex(n => n.id === player.id),
-    //   1
-    // );
-    //
-    // this.setState({ players: this.props.players });
   }
 
   updateTeam(nextProps) {
@@ -31,7 +25,7 @@ class Team extends React.Component {
       return this.state.players.map((n, i) => (
         <div className="row" key={i + n}>
           <div className="col">
-            {n.name}{" "}
+            {n.displayName}{" "}
             <span
               className="link right"
               onClick={() => this.removePlayerFromTeam(n)}
@@ -48,9 +42,8 @@ class Team extends React.Component {
             <p>No players in this team.</p>
           </div>
         </div>
-      )
+      );
     }
-
   }
 
   render() {
