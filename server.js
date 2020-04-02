@@ -252,7 +252,7 @@ function createMatch() {
   return matchConfig;
 }
 
-app.get("/startgame", (req, res) => {
+app.get("/api/startgame", (req, res) => {
   rcon.connect().then(() => {
     rcon.command("quit").then(console.log("RESTART SUCCESS"), console.error("RESTART FAILED"));
   });
