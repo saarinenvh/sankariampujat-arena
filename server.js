@@ -222,12 +222,7 @@ function createTeamDTO(team) {
 function createMatch() {
   const map =
     "de_" +
-    Math.max.apply(
-      null,
-      Object.keys(votedto).map(function(key) {
-        return key;
-      })
-    );
+    Object.keys(votedto).reduce((a, b) => (votedto[a] > votedto[b] ? a : b));
 
   const matchConfig = {
     matchid: "SankariBattle",
