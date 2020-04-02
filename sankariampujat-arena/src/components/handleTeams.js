@@ -166,7 +166,6 @@ class HandleTeams extends React.Component {
     //   });
 
     newState.playerPool = [];
-
     this.postToBackEndApi("/api/updateState", newState);
   }
 

@@ -213,9 +213,10 @@ app.get("/api/validateSession", (req, res) => {
 
 function createTeamDTO(team) {
   const teamDTO = {};
-  return team.map(n => {
+  team.map(n => {
     teamDTO[n.id] = n.displayName;
   });
+  return teamDTO;
 }
 
 function createMatch() {
@@ -224,11 +225,11 @@ function createMatch() {
     Math.max.apply(
       null,
       Object.keys(votedto).map(function(key) {
-        return votedto[key];
+        return key;
       })
     );
 
-  const match = {
+  const matchConfig = {
     matchid: "SankariBattle",
     num_maps: 1,
     players_per_team: 5,
@@ -263,16 +264,14 @@ app.get("/startgame", (req, res) => {
 
   setTimeout(() => {
     rcon.connect().then(() => {
-      rcon.command(
-        "get5_loadmatch_url http://167.172.166.236/api/getMatchConfig"
-      );
+      rcon.command("get5_loadmatch_url 167.172.166.236/api/getMatchConfig");
     });
   }, 5000);
 
   res.send({ game: "started" });
 });
 
-app.get("/api/getMatchConfig", (req, res) => {
+app.get("/api/loadMatchConfig", (req, res) => {
   const matchConfig = createMatch();
   res.send(matchConfig);
 });
