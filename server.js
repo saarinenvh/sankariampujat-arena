@@ -11,8 +11,8 @@ const session = require("express-session");
 const SteamStrategy = require("./lib/passport-steam").Strategy;
 let Rcon = require("srcds-rcon");
 let rcon = Rcon({
-  address: "suomi6.net9.fi",
-  password: "frisbee"
+  address: process.env.RCON_ADDRESS,
+  password: process.env.RCON_PASSWORD
 });
 
 var cors = require("cors");
@@ -85,7 +85,7 @@ passport.use(
 );
 
 app.use(cors());
-app.use(bodyParser.json());
+app.use(bodyParser.j/root/.pm2/logs/server-error.log son());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(function(request, response, next) {
   response.header("Access-Control-Allow-Origin", "*");
