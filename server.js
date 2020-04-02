@@ -254,12 +254,12 @@ function createMatch() {
 
 app.get("/startgame", (req, res) => {
   rcon.connect().then(() => {
-    rcon.command("quit");
+    rcon.command("quit").then(console.log("RESTART SUCCESS"), console.error("RESTART FAILED"));
   });
 
   setTimeout(() => {
     rcon.connect().then(() => {
-      rcon.command("get5_loadmatch_url 167.172.166.236/api/getMatchConfig");
+      rcon.command("get5_loadmatch_url 167.172.166.236/api/loagMatchConfig").then(console.log("MATCH CONFIG LOADED SUCCESFULLY"), console.error("ERROR LOADING MATCH CONFIG"));
     });
   }, 5000);
 
