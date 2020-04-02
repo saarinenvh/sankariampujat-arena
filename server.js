@@ -77,7 +77,7 @@ app.get('/auth/steam',
   passport.authenticate('steam', { failureRedirect: '/' }),
   function(req, res) {
     console.log(res)
-    res.redirect('/');
+    res.redirect('');
   });
 
 // GET /auth/steam/return

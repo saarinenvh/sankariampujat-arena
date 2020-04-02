@@ -1,10 +1,10 @@
 import React from "react";
 import Team from "./team";
-import MapVote from "./mapVote"
+import MapVote from "./mapVote";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import socketIOClient from "socket.io-client";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 
 class HandleTeams extends React.Component {
   constructor(props) {
@@ -17,55 +17,56 @@ class HandleTeams extends React.Component {
       },
       votes: {},
       newPlayer: "",
-      endpoint: "http://167.172.166.236"
+      endpoint: "http://167.172.166.236:5500"
     };
   }
 
   componentDidMount() {
-    console.log(process.env.ENDPOINT)
     // Call our fetch function below once the component mounts
-  this.getFromBackEndAPI('/api/getState')
-    .then(res => this.setState( {serverData: res} ), () => {})
-    .catch(err => console.log(err));
+    this.getFromBackEndAPI("/api/getState")
+      .then(res => this.setState({ serverData: res }), () => {})
+      .catch(err => console.log(err));
 
-  this.getFromBackEndAPI('/api/getVotes')
-    .then(res => {this.setState( {votes: res}, () => console.log(this.state))})
-    .catch(err => console.log(err));
+    this.getFromBackEndAPI("/api/getVotes")
+      .then(res => {
+        this.setState({ votes: res }, () => console.log(this.state));
+      })
+      .catch(err => console.log(err));
 
-  const { endpoint } = this.state;
-  const socket = socketIOClient(endpoint);
-  socket.on("STATE", data => this.setState({serverData: data}));
-  socket.on("VOTES", data => this.setState({votes: data}));
-}
+    const { endpoint } = this.state;
+    const socket = socketIOClient(endpoint);
+    socket.on("STATE", data => this.setState({ serverData: data }));
+    socket.on("VOTES", data => this.setState({ votes: data }));
+  }
 
-  getFromBackEndAPI = async (url) => {
+  getFromBackEndAPI = async url => {
     const response = await fetch(url);
     const body = await response.json();
 
     if (response.status !== 200) {
-      throw Error(body.message)
+      throw Error(body.message);
     }
     return body;
   };
 
   postToBackEndApi = async (url, body) => {
     const requestOptions = {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body)
     };
     const response = await fetch(url, requestOptions);
     const data = await response.json();
-    this.setState({serverData: data}, () => {});
-}
+    this.setState({ serverData: data }, () => {});
+  };
 
   async assignToTeam(player, team) {
     let pool = this.state.serverData.playerPool;
     pool.splice(pool.findIndex(n => n.id === player.id), 1);
-    const newState = this.state.serverData
-    newState.playerPool = pool
+    const newState = this.state.serverData;
+    newState.playerPool = pool;
     team === 1 ? newState.team1.push(player) : newState.team2.push(player);
-    this.postToBackEndApi('/api/updateState', newState)
+    this.postToBackEndApi("/api/updateState", newState);
   }
 
   async deletePlayer(player) {
@@ -73,7 +74,7 @@ class HandleTeams extends React.Component {
     pool.splice(pool.findIndex(n => n.id === player.id), 1);
     const newState = this.state.serverData;
     newState.playerPool = pool;
-    this.postToBackEndApi('/api/updateState', newState)
+    this.postToBackEndApi("/api/updateState", newState);
   }
 
   createNewPlayer() {
@@ -84,10 +85,10 @@ class HandleTeams extends React.Component {
   async addPlayerToPool(player) {
     let pool = this.state.serverData.playerPool;
     pool.push(player);
-    const newState = this.state.serverData
-    newState['playerPool'] = pool
-    await this.postToBackEndApi('/api/updateState', newState)
-    this.setState({newPlayer: ""})
+    const newState = this.state.serverData;
+    newState["playerPool"] = pool;
+    await this.postToBackEndApi("/api/updateState", newState);
+    this.setState({ newPlayer: "" });
   }
 
   handleChange(event) {
@@ -97,21 +98,21 @@ class HandleTeams extends React.Component {
   async emptyTeams() {
     let pool = this.state.serverData.team1.concat(this.state.serverData.team2);
     pool = pool.concat(this.state.serverData.playerPool);
-    const newState = this.state.serverData
+    const newState = this.state.serverData;
     newState.playerPool = pool;
     newState.team1 = [];
     newState.team2 = [];
-    this.postToBackEndApi('/api/updateState', newState)
+    this.postToBackEndApi("/api/updateState", newState);
   }
 
   async removeAllPlayers() {
-    const newState = this.state.serverData
+    const newState = this.state.serverData;
     newState.playerPool = [];
-    this.postToBackEndApi('/api/updateState', newState)
+    this.postToBackEndApi("/api/updateState", newState);
   }
 
   shuffleArray(array) {
-    console.log(array)
+    console.log(array);
     let i = array.length;
     while (i--) {
       const ri = Math.floor(Math.random() * (i + 1));
@@ -122,14 +123,23 @@ class HandleTeams extends React.Component {
 
   randomizeTeams() {
     // Empty teams and put them to playerPool
-    const newState = { playerPool: [], team1: [], team2: [] }
-    newState.playerPool = newState.playerPool.concat(this.state.serverData.team1);
-    newState.playerPool = newState.playerPool.concat(this.state.serverData.team2);
-    newState.playerPool = newState.playerPool.concat(this.state.serverData.playerPool);
+    const newState = { playerPool: [], team1: [], team2: [] };
+    newState.playerPool = newState.playerPool.concat(
+      this.state.serverData.team1
+    );
+    newState.playerPool = newState.playerPool.concat(
+      this.state.serverData.team2
+    );
+    newState.playerPool = newState.playerPool.concat(
+      this.state.serverData.playerPool
+    );
 
-    newState.playerPool = this.shuffleArray(newState.playerPool)
-    newState.team1 = newState.playerPool.splice(0, Math.floor(newState.playerPool.length / 2))
-    newState.team2 = newState.playerPool
+    newState.playerPool = this.shuffleArray(newState.playerPool);
+    newState.team1 = newState.playerPool.splice(
+      0,
+      Math.floor(newState.playerPool.length / 2)
+    );
+    newState.team2 = newState.playerPool;
 
     // newState.playerPool.forEach(n => {
     //     if (Math.floor(Math.random() * 2) === 1) {
@@ -149,22 +159,24 @@ class HandleTeams extends React.Component {
 
     newState.playerPool = [];
 
-    this.postToBackEndApi('/api/updateState', newState)
+    this.postToBackEndApi("/api/updateState", newState);
   }
 
   handleAuth() {
-    this.getFromBackEndAPI('/auth/steam')
+    this.getFromBackEndAPI("/auth/steam");
   }
 
-  playerFromTeamToPool = async (e) => {
+  playerFromTeamToPool = async e => {
     let pool = this.state.serverData.playerPool;
     pool.push(e);
     const newState = this.state.serverData;
-    const index1 = newState.team1.findIndex(n => n.id === e.id)
-    const index2 = newState.team2.findIndex(n => n.id === e.id)
-    index1 !== -1 ? newState.team1.splice(index1,1) : newState.team2.splice(index2, 1)
+    const index1 = newState.team1.findIndex(n => n.id === e.id);
+    const index2 = newState.team2.findIndex(n => n.id === e.id);
+    index1 !== -1
+      ? newState.team1.splice(index1, 1)
+      : newState.team2.splice(index2, 1);
     newState.playerPool = pool;
-    this.postToBackEndApi('/api/updateState', newState)
+    this.postToBackEndApi("/api/updateState", newState);
   };
 
   generatePlayerPool() {
@@ -192,88 +204,91 @@ class HandleTeams extends React.Component {
         </div>
       ));
     } else {
-      return (<div><p>No players in this team.</p></div>)
+      return (
+        <div>
+          <p>No players in this team.</p>
+        </div>
+      );
     }
-
   }
 
   handleSubmit(e) {
     e.preventDefault();
-    this.createNewPlayer()
+    this.createNewPlayer();
   }
 
   render() {
     return (
       <div className="whole">
-          <div className="main mb-3">
-            <div className="row">
-              <div className="col">
-                <p className="link" onClick={() => this.handleAuth()}>Sign On with Steam</p>
-              </div>
-            </div>
-            <div className="row ml-2 mr-2">
-              <div className="col">
-                <h1>Add new player</h1>
-              </div>
-              <div className="col">
-                <form
-                  className="form-inline justify-content-center"
-                  onSubmit={e => {
-                    this.handleSubmit(e);
-                  }}
-                >
-                  <div className="form-group">
-                    <label className="mr-2">Name </label>
-                    <input
-                      className="form-control mr-2"
-                      value={this.state.newPlayer}
-                      onChange={this.handleChange.bind(this)}
-                      id="playerName"
-                    ></input>
-                  </div>
-                  <button
-                    className="btn btn-primary"
-                    type="button"
-                    onClick={() => {
-                      this.createNewPlayer();
-                    }}
-                  >
-                    Add
-                  </button>
-                </form>
-              </div>
+        <div className="main mb-3">
+          <div className="row">
+            <div className="col">
+              <a href="/auth/steam">Sign On with Steam</a>
             </div>
           </div>
-          <div className="main mb-3">
-            <div className="row ml-2 mr-2">
-              <div className="col">
-                <h1>Player Pool</h1>
-              </div>
+          <div className="row ml-2 mr-2">
+            <div className="col">
+              <h1>Add new player</h1>
             </div>
+            <div className="col">
+              <form
+                className="form-inline justify-content-center"
+                onSubmit={e => {
+                  this.handleSubmit(e);
+                }}
+              >
+                <div className="form-group">
+                  <label className="mr-2">Name </label>
+                  <input
+                    className="form-control mr-2"
+                    value={this.state.newPlayer}
+                    onChange={this.handleChange.bind(this)}
+                    id="playerName"
+                  ></input>
+                </div>
+                <button
+                  className="btn btn-primary"
+                  type="button"
+                  onClick={() => {
+                    this.createNewPlayer();
+                  }}
+                >
+                  Add
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+        <div className="main mb-3">
+          <div className="row ml-2 mr-2">
+            <div className="col">
+              <h1>Player Pool</h1>
+            </div>
+          </div>
 
-            <div className="row">
-              <div className="col">
-                <div className="card">
-                  <div className="card-body">
-                    <div className="playerList">{this.generatePlayerPool()}</div>
-                  </div>
+          <div className="row">
+            <div className="col">
+              <div className="card">
+                <div className="card-body">
+                  <div className="playerList">{this.generatePlayerPool()}</div>
                 </div>
               </div>
             </div>
+          </div>
 
-            <div className="row mt-2">
-              <div className="col">
-                <button
-                  className="btn btn-primary float-right"
-                  onClick={() => {
-                    this.removeAllPlayers();
-                  }}
-                >
+          <div className="row mt-2">
+            <div className="col">
+              <button
+                className="btn btn-primary float-right"
+                onClick={() => {
+                  this.removeAllPlayers();
+                }}
+              >
                 Remove all players
-                </button>
-              </div>
+              </button>
             </div>
           </div>
+        </div>
 
         <div className="main mb-3">
           <div className="teamsSection">
@@ -298,14 +313,14 @@ class HandleTeams extends React.Component {
           </div>
           <div className="row mt-3 ml-2 mr-2 ">
             <div className="col">
-                <button
-                  className="btn btn-primary float-right ml-2"
-                  onClick={() => {
-                    this.randomizeTeams();
-                  }}
-                >
-                  Randomize
-                </button>
+              <button
+                className="btn btn-primary float-right ml-2"
+                onClick={() => {
+                  this.randomizeTeams();
+                }}
+              >
+                Randomize
+              </button>
               <button
                 className="btn btn-primary float-right"
                 onClick={() => {
@@ -322,17 +337,15 @@ class HandleTeams extends React.Component {
           <div className="mapVote">
             <div className="row  ml-2 mr-2">
               <div className="col">
-                {
-                Object.keys(this.state.votes).includes('dust2') ?
-                <MapVote key={uuidv4()} votes={this.state.votes}></MapVote>
-                :
-                <div/>
-              }
+                {Object.keys(this.state.votes).includes("dust2") ? (
+                  <MapVote key={uuidv4()} votes={this.state.votes}></MapVote>
+                ) : (
+                  <div />
+                )}
               </div>
             </div>
           </div>
         </div>
-
       </div>
     );
   }
