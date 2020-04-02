@@ -17,11 +17,12 @@ class HandleTeams extends React.Component {
       },
       votes: {},
       newPlayer: "",
-      endpoint: process.env.ENDPOINT
+      endpoint: "http://167.172.166.236"
     };
   }
 
   componentDidMount() {
+    console.log(process.env.ENDPOINT)
     // Call our fetch function below once the component mounts
   this.getFromBackEndAPI('/api/getState')
     .then(res => this.setState( {serverData: res} ), () => {})
@@ -147,9 +148,12 @@ class HandleTeams extends React.Component {
     //   });
 
     newState.playerPool = [];
-    console.log(newState)
 
     this.postToBackEndApi('/api/updateState', newState)
+  }
+
+  handleAuth() {
+    this.getFromBackEndAPI('/auth/steam')
   }
 
   playerFromTeamToPool = async (e) => {
@@ -202,6 +206,11 @@ class HandleTeams extends React.Component {
     return (
       <div className="whole">
           <div className="main mb-3">
+            <div className="row">
+              <div className="col">
+                <p className="link" onClick={() => this.handleAuth()}>Sign On with Steam</p>
+              </div>
+            </div>
             <div className="row ml-2 mr-2">
               <div className="col">
                 <h1>Add new player</h1>
