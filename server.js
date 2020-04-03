@@ -85,7 +85,7 @@ passport.use(
 );
 
 app.use(cors());
-app.use(bodyParser.j/root/.pm2/logs/server-error.log son());
+app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(function(request, response, next) {
   response.header("Access-Control-Allow-Origin", "*");
@@ -199,6 +199,11 @@ app.post("/api/updateState", (req, res) => {
   res.send(state);
 });
 
+app.post("/api/matchState", (req, res) => {
+  console.log(req.body);
+  res.send("ok");
+});
+
 app.get("/api/getState", (req, res) => {
   res.send(state);
 });
@@ -245,7 +250,9 @@ function createMatch() {
     },
 
     cvars: {
-      hostname: "SankariArena"
+      hostname: "SankariArena",
+      get5_web_api_url: "167.172.166.236/api/matchState",
+      get5_web_api_key: process.env.STEAM_API_KEY
     }
   };
 
@@ -254,43 +261,51 @@ function createMatch() {
 
 app.get("/api/startgame", (req, res) => {
   rcon.connect().then(() => {
-    console.log
-    rcon.command("quit").then(console.log("RESTART SUCCESS"), console.error("RESTART FAILED"));
+    console.log;
+    rcon
+      .command("quit")
+      .then(console.log("RESTART SUCCESS"), console.error("RESTART FAILED"));
   });
 
   setTimeout(() => {
     rcon.connect().then(() => {
-      rcon.command("get5_loadmatch_url 167.172.166.236/api/loagMatchConfig").then(console.log("MATCH CONFIG LOADED SUCCESFULLY"), console.error("ERROR LOADING MATCH CONFIG"));
+      rcon
+        .command("get5_loadmatch_url 167.172.166.236/api/loagMatchConfig")
+        .then(
+          console.log("MATCH CONFIG LOADED SUCCESFULLY"),
+          console.error("ERROR LOADING MATCH CONFIG")
+        );
     });
   }, 25000);
 
   res.send({ game: "started" });
 });
 
-app.get("/api/getPracMode", (res,req) =>  {
+app.get("/api/getPracMode", (res, req) => {
   rcon.connect().then(() => {
-    rcon.command("get5_check_auths").then( auths => {
-      auths === 0 ? state.praccMode = false : state.praccMode = true
+    rcon.command("get5_check_auths").then(auths => {
+      auths === 0 ? (state.praccMode = false) : (state.praccMode = true);
     });
   });
-  res.send(state.praccMode)
+  res.send(state.praccMode);
 });
 
-app.get("/api/togglePracMode", (res,req) =>  {
+app.get("/api/togglePracMode", (res, req) => {
   rcon.connect().then(() => {
-    rcon.command("get5_check_auths").then( auths => {
-      auths === 0 ? state.praccMode = false : state.praccMode = true
+    rcon.command("get5_check_auths").then(auths => {
+      auths === 0 ? (state.praccMode = false) : (state.praccMode = true);
     });
   });
 
   rcon.connect().then(() => {
-    newMode = state.praccMode === 0 ? 1 : 0
-    rcon.command(`get5_check_auths ${newMode}`).then( console.log("TOGGLED AUTH REQUIREMENTS")
-    });
+    const newMode = state.praccMode === 0 ? 1 : 0;
+    rcon
+      .command(`get5_check_auths ${newMode}`)
+      .then(console.log("TOGGLED AUTH REQUIREMENTS"));
   });
 
-  state.praccMode = newMode === 1 ? true : false
-  res.send(state.praccMode)
+  state.praccMode = newMode === 1 ? true : false;
+  res.send(state.praccMode);
 });
 
 app.get("/api/loadMatchConfig", (req, res) => {
