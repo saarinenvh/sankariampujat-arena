@@ -310,7 +310,7 @@ app.get("/api/startGame", (req, res) => {
     });
   }, 25000);
 
-  res.send({ game: "started" });
+  res.send(state);
 });
 
 app.get("/api/loadMatchConfig", (req, res) => {
