@@ -259,7 +259,7 @@ function createMatch() {
   return matchConfig;
 }
 
-app.get("/api/startgame", (req, res) => {
+app.get("/api/startGame", (req, res) => {
   rcon.connect().then(() => {
     console.log;
     rcon
