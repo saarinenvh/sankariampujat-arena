@@ -204,6 +204,11 @@ app.post("/api/matchState", (req, res) => {
   res.send("ok");
 });
 
+app.get("/api/matchState", (req, res) => {
+  console.log(req.body);
+  res.send("ok");
+});
+
 app.get("/api/getState", (req, res) => {
   res.send(state);
 });
