@@ -3,8 +3,8 @@ import Team from "./team";
 import MapVote from "./mapVote";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faUserPlus } from "@fortawesome/free-solid-svg-icons";
 import socketIOClient from "socket.io-client";
-import steam from "../files/steam.jpg";
 import { v4 as uuidv4 } from "uuid";
 
 class HandleTeams extends React.Component {
@@ -12,20 +12,23 @@ class HandleTeams extends React.Component {
     super(props);
     this.state = {
       serverData: {
+        user: undefined,
         playerPool: [],
         team1: [],
         team2: []
       },
-      user: undefined,
+
       votes: {},
       newPlayer: "",
-      endpoint: "http://167.172.166.236:5500"
+      endpoint: "http://localhost:5500"
     };
   }
 
   async checkIfAuthenticated() {
-    const user = await this.getFromBackEndAPI("/api/validateSession");
-    if (user) this.setState({ user: user });
+    let user = await this.getFromBackEndAPI("/api/validateSession");
+    const newState = this.state.serverData;
+    newState.user = user;
+    if (user) this.setState(newState);
   }
 
   componentDidMount() {
@@ -56,6 +59,14 @@ class HandleTeams extends React.Component {
     }
     return body;
   };
+
+  joinPool() {
+    this.setState(this.getFromBackEndAPI("/api/joinToPlayerPool"));
+  }
+
+  leavePool() {
+    this.setState(this.getFromBackEndAPI("/api/leavePlayerPool"));
+  }
 
   postToBackEndApi = async (url, body) => {
     const requestOptions = {
@@ -131,7 +142,11 @@ class HandleTeams extends React.Component {
 
   randomizeTeams() {
     // Empty teams and put them to playerPool
-    const newState = { playerPool: [], team1: [], team2: [] };
+    const newState = JSON.parse(JSON.stringify(this.state.serverData));
+    newState.playerPool = [];
+    newState.team1 = [];
+    newState.team2 = [];
+
     newState.playerPool = newState.playerPool.concat(
       this.state.serverData.team1
     );
@@ -148,24 +163,8 @@ class HandleTeams extends React.Component {
       Math.floor(newState.playerPool.length / 2)
     );
     newState.team2 = newState.playerPool;
-
-    // newState.playerPool.forEach(n => {
-    //     if (Math.floor(Math.random() * 2) === 1) {
-    //       if (newState.team1.length < newState.playerPool.length / 2) {
-    //         newState.team1.push(n);
-    //       } else {
-    //         newState.team2.push(n);
-    //       }
-    //     } else {
-    //       if (newState.team2.length < newState.playerPool.length / 2) {
-    //         newState.team2.push(n);
-    //       } else {
-    //         newState.team1.push(n);
-    //       }
-    //     }
-    //   });
-
     newState.playerPool = [];
+    console.log(newState);
     this.postToBackEndApi("/api/updateState", newState);
   }
 
@@ -191,33 +190,44 @@ class HandleTeams extends React.Component {
   };
 
   generatePlayerPool() {
-    if (Object.keys(this.state.serverData).includes("playerPool")) {
+    if (
+      Object.keys(this.state.serverData).includes("playerPool") &&
+      this.state.serverData.playerPool.length > 0
+    ) {
       return this.state.serverData.playerPool.map((n, i) => (
-        <div className="row" key={uuidv4()}>
-          <div className="col-md-10">{n.displayName}</div>
-          <div className="col-md-2">
-            <span
-              className="teamNumber link mr-4"
-              onClick={() => this.assignToTeam(n, 1)}
-            >
-              1
-            </span>
-            <span
-              className="teamNumber link mr-4"
-              onClick={() => this.assignToTeam(n, 2)}
-            >
-              2
-            </span>
-            <span onClick={() => this.deletePlayer(n)}>
-              <FontAwesomeIcon className="link trash" icon={faTrash} />
-            </span>
+        <div className="row name" key={uuidv4()}>
+          <div className="col-md-10">
+            <span className="mr-2">{i + 1}.</span>
+            {n.displayName}
           </div>
+          {n.id === this.state.serverData.user.id ||
+          this.state.serverData.user.displayName === "vhs" ? (
+            <div className="col-md-2 float-right">
+              <span
+                className="teamNumber link mr-4"
+                onClick={() => this.assignToTeam(n, 1)}
+              >
+                1
+              </span>
+              <span
+                className="teamNumber link mr-4"
+                onClick={() => this.assignToTeam(n, 2)}
+              >
+                2
+              </span>
+              <span onClick={() => this.deletePlayer(n)}>
+                <FontAwesomeIcon className="link trash" icon={faTrash} />
+              </span>
+            </div>
+          ) : (
+            <div></div>
+          )}
         </div>
       ));
     } else {
       return (
-        <div>
-          <p>No players in this team.</p>
+        <div className="text-center p-3">
+          <p>No players in Player Pool</p>
         </div>
       );
     }
@@ -231,50 +241,56 @@ class HandleTeams extends React.Component {
   render() {
     return (
       <div className="whole">
-        {this.state.user === undefined ? (
-          <div className="main mb-3">
+        {this.state.serverData.user === undefined ? (
+          <div className="headerContainer mt-5 animate">
             <div className="row ml-2 mr-2">
               <div className="col">
-                <h1>Join to game</h1>
-              </div>
-              <div className="col">
-                <a href="/auth/steam">
-                  <img src={steam} alt="Sign in through steam"></img>
-                </a>
-                {/* <form
-                        className="form-inline justify-content-center"
-                        onSubmit={e => {
-                          this.handleSubmit(e);
-                        }}
-                      >
-                        <div className="form-group">
-                          <label className="mr-2">Name </label>
-                          <input
-                            className="form-control mr-2"
-                            value={this.state.newPlayer}
-                            onChange={this.handleChange.bind(this)}
-                            id="playerName"
-                          ></input>
-                        </div>
-                        <button
-                          className="btn btn-primary"
-                          type="button"
-                          onClick={() => {
-                            this.createNewPlayer();
-                          }}
-                        >
-                          Add
-                        </button>
-                      </form> */}
+                <h1 className="headerTitle text-center">
+                  Join the game
+                  <span className="ml-3 steamsign">
+                    <a className="not-active" href="/auth/steam">
+                      HERE.
+                    </a>
+                  </span>
+                </h1>
               </div>
             </div>
           </div>
         ) : (
           <div>
-            <div className="main mb-3">
+            <div className="main mb-3 animate">
               <div className="row ml-2 mr-2">
                 <div className="col">
                   <h1>Player Pool</h1>
+                </div>
+                <div className="col-md-6 pr-0">
+                  {!this.state.serverData.playerPool.find(
+                    n => n.id === this.state.serverData.user.id
+                  ) &&
+                  !this.state.serverData.team1.find(
+                    n => n.id === this.state.serverData.user.id
+                  ) &&
+                  !this.state.serverData.team2.find(
+                    n => n.id === this.state.serverData.user.id
+                  ) ? (
+                    <h4
+                      onClick={() => {
+                        this.joinPool();
+                      }}
+                      className="float-right join"
+                    >
+                      Join Player Pool
+                      <span className="ml-2">
+                        <FontAwesomeIcon
+                          flip="horizontal"
+                          className="userplus"
+                          icon={faUserPlus}
+                        />
+                      </span>
+                    </h4>
+                  ) : (
+                    <div></div>
+                  )}
                 </div>
               </div>
 
@@ -293,18 +309,26 @@ class HandleTeams extends React.Component {
               <div className="row mt-2">
                 <div className="col">
                   <button
-                    className="btn btn-primary float-right"
+                    className="btn btn-primary float-right ml-2"
                     onClick={() => {
                       this.removeAllPlayers();
                     }}
                   >
-                    Remove all players
+                    Empty Player Pool
+                  </button>
+                  <button
+                    className="btn btn-primary float-right ml-2"
+                    onClick={() => {
+                      this.randomizeTeams();
+                    }}
+                  >
+                    Assign players to teams
                   </button>
                 </div>
               </div>
             </div>
 
-            <div className="main mb-3">
+            <div className="main mb-3 animate">
               <div className="teamsSection">
                 <div className="row  ml-2 mr-2">
                   <div className="col">
@@ -347,26 +371,23 @@ class HandleTeams extends React.Component {
               </div>
             </div>
 
-            <div className="main mb-3">
+            <div id="mapVoteContainer" className="main mb-3 animate">
               <div className="mapVote">
-                <div className="row  ml-2 mr-2">
+                <div className="row ml-2 mr-2">
                   <div className="col">
                     <MapVote key={uuidv4()} votes={this.state.votes}></MapVote>
                   </div>
                 </div>
-              </div>
-            </div>
-
-            <div className="main mb-3">
-              <div className="mapVote">
-                <div className="row  ml-2 mr-2">
-                  <div className="col">
-                    <button
-                      className="btn btn-primary"
-                      onClick={() => this.startGame()}
-                    >
-                      Start Game!
-                    </button>
+                <div className="startGame">
+                  <div className="row  ml-2 mr-2">
+                    <div className="col justify-content-center">
+                      <button
+                        className="btn btn-lg btn-primary"
+                        onClick={() => this.startGame()}
+                      >
+                        Start Game!
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>

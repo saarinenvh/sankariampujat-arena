@@ -7,8 +7,73 @@ h5 {
   font-family: "Spicy Rice", cursive;
 }
 
+.join {
+  margin-top: 15px;
+  color: #c9ffc9;
+}
+
+.name {
+  border-bottom: 2px dotted lightgrey;
+  margin: 15px;
+}
+
+.join:hover {
+  color: green;
+  cursor: pointer;
+}
+
+.not-active {
+  text-decoration: none;
+  color: inherit;
+}
+
+.not-active:hover {
+  text-decoration: none;
+  color: inherit;
+}
+
+.join:hover .userplus {
+  color: green;
+}
 .teamNumber {
   font-family: "Spicy Rice", cursive;
+}
+
+.steamsign {
+  color: #c9ffc9;
+  text-shadow: none;
+}
+
+.steamsign:hover {
+  color: lime;
+  cursor: pointer;
+}
+
+.headerTitle {
+  color: #deffc5;
+  font-size: 5rem;
+  text-shadow: 5px 2px 5px lime;
+  -webkit-text-stroke: 1px #1eff0f;
+}
+
+.userplus {
+  color: #c9ffc9;
+}
+
+.usertext {
+  color: white;
+}
+
+.signOut:hover {
+  cursor: pointer;
+  color: lime;
+}
+
+.headerContainer {
+  background-color: #96a4e685;
+  border-radius: 20px;
+  padding: 120px 80px 120px 80px;
+  border: 2px solid #96a4e6f2;
 }
 
 .teamNumber:hover,
@@ -28,15 +93,59 @@ h4 {
   color: black;
 }
 
+.animate {
+  animation-name: showSlow;
+  animation-duration: 2s;
+}
+
+@keyframes showSlow {
+  0% {
+    opacity: 0;
+  }
+  25% {
+    opacity: 25;
+  }
+  50% {
+    opacity: 50;
+  }
+  75% {
+    opacity: 75;
+  }
+  100% {
+    opacity: 100;
+  }
+}
+
+@keyframes showMedium {
+}
+
+@keyframes showFast {
+}
+
 #header {
   color: lime;
 }
+#mapVoteContainer {
+  padding-bottom: 30px;
+}
+
+.startGame {
+  display: flex;
+  justify-content: center;
+  padding-top: 20px;
+  margin-top: 20px;
+  border-top: 2px solid #5060af;
+}
+
+.card {
+  background-color: #ffffffc7 !important;
+}
 
 .main {
-  background-color: #96a4e6;
-  opacity: 0.95;
-  border-radius: 30px;
+  background-color: rgba(150, 164, 230, 0.85);
+  border-radius: 25px;
   padding: 80px;
+  border: 2px solid #96a4e6f2;
 }
 
 .link {

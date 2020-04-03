@@ -9,16 +9,28 @@ const mysql = require("mysql");
 const dotenv = require("dotenv");
 const session = require("express-session");
 const SteamStrategy = require("./lib/passport-steam").Strategy;
+var cors = require("cors");
 dotenv.config();
+
+// INIT APP FOR API PURPOSES
+
+// IINIT RCON CONNECTION
 let Rcon = require("srcds-rcon");
 let rcon = Rcon({
   address: process.env.RCON_ADDRESS,
   password: process.env.RCON_PASSWORD
 });
 
-var cors = require("cors");
-
-let state = { praccMode: false, playerPool: [], team1: [], team2: [] };
+// INIT STATE VARIABLES TODO MOVE THESE TO DB
+let connectedUsers = [];
+let state = {
+  status: "INIT",
+  playerPool: [],
+  team1: [],
+  team2: [],
+  data: {},
+  user: undefined
+};
 let votedto = {
   dust2: 0,
   inferno: 0,
@@ -40,6 +52,7 @@ let votes = {
   vertigo: []
 };
 
+// CREATE DB CONNECTION
 let connection = mysql.createConnection({
   host: process.env.DB_HOST, // eslint-disable-line
   user: process.env.DB_USERNAME, // eslint-disable-line
@@ -51,6 +64,7 @@ connection.connect(function(err) {
   if (err) throw err;
 });
 
+// INIT PASSPORT FOT STEAM LOGIN
 passport.serializeUser(function(user, done) {
   done(null, user);
 });
@@ -59,10 +73,6 @@ passport.deserializeUser(function(obj, done) {
   done(null, obj);
 });
 
-// Use the SteamStrategy within Passport.
-//   Strategies in passport require a `validate` function, which accept
-//   credentials (in this case, an OpenID identifier and profile), and invoke a
-//   callback with a user object.
 passport.use(
   new SteamStrategy(
     {
@@ -71,12 +81,7 @@ passport.use(
       apiKey: process.env.STEAM_API_KEY
     },
     function(identifier, profile, done) {
-      // asynchronous verification, for effect...
       process.nextTick(function() {
-        // To keep the example simple, the user's Steam profile is returned to
-        // represent the logged-in user.  In a typical application, you would want
-        // to associate the Steam account with a user record in your database,
-        // and return that user instead.
         profile.identifier = identifier;
         return done(null, profile);
       });
@@ -109,21 +114,6 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(express.static(__dirname + "/../../public"));
 
-// Passport session setup.
-//   To support persistent login sessions, Passport needs to be able to
-//   serialize users into and deserialize users out of the session.  Typically,
-//   this will be as simple as storing the user ID when serializing, and finding
-//   the user by ID when deserializing.  However, since this example does not
-//   have a database of user records, the complete Steam profile is serialized
-//   and deserialized.
-passport.serializeUser(function(user, done) {
-  done(null, user);
-});
-
-passport.deserializeUser(function(obj, done) {
-  done(null, obj);
-});
-
 app.get(
   "/auth/steam",
   passport.authenticate("steam", { failureRedirect: "/" }),
@@ -132,27 +122,42 @@ app.get(
   }
 );
 
-const user = [];
-
-// GET /auth/steam/return
-//   Use passport.authenticate() as route middleware to authenticate the
-//   request.  If authentication fails, the user will be redirected back to the
-//   login page.  Otherwise, the primary route function function will be called,
-//   which, in this example, will redirect the user to the home page.
 app.get(
   "/auth/steam/return",
   passport.authenticate("steam", { failureRedirect: "/" }),
   function(req, res) {
     if (Object.keys(req).includes("user")) {
-      state.playerPool.push(req.user);
+      state.user = req.user;
+      connectedUsers.push(req.user);
     }
     res.redirect("/");
   }
 );
 
+app.get("/api/logout", (req, res) => {
+  if (connectedUsers.find(n => n.id === req.user.id))
+    connectedUsers.splice(
+      connectedUsers.findIndex(n => n.id === req.user.id),
+      1
+    );
+  if (state.playerPool.find(n => n.id === req.user.id))
+    state.playerPool.splice(
+      state.playerPool.findIndex(n => n.id === req.user.id),
+      1
+    );
+  if (state.team1.find(n => n.id === req.user.id))
+    state.team1.splice(state.team1.findIndex(n => n.id === req.user.id), 1);
+  if (state.team2.find(n => n.id === req.user.id))
+    state.team2.splice(state.team2.findIndex(n => n.id === req.user.id), 1);
+  req.logout();
+  state.user = undefined;
+  res.send(state);
+});
+
+//START SERVER
 const server = app.listen(port, () => console.log(`Listening on port ${port}`));
 
-let playerID;
+// HANDLING SOCKET
 const io = socketIo(server, { "force new connection": true });
 let interval;
 
@@ -172,8 +177,13 @@ const getApiAndEmit = async socket => {
   }
 };
 
+// API FOR HANDLING FRONT
 app.get("/api/getVotes", (req, res) => {
   res.send(votedto);
+});
+
+app.get("/api/getState", (req, res) => {
+  res.send(state);
 });
 
 app.post("/api/updateVotes", (req, res) => {
@@ -199,26 +209,44 @@ app.post("/api/updateState", (req, res) => {
   res.send(state);
 });
 
-app.post("/api/matchState", (req, res) => {
-  console.log(req.body);
-  res.send("ok");
+app.get("/api/joinToPlayerPool", (req, res) => {
+  state.playerPool.push(req.user);
+  res.send(state);
 });
 
-app.get("/api/matchState", (req, res) => {
-  console.log(req.body);
-  res.send("ok");
-});
-
-app.get("/api/getState", (req, res) => {
+app.get("/api/leavePlayerPool", (req, res) => {
+  state.playerPool.splice(
+    state.playerPool.findIndex(n => n.id == req.user.id),
+    1
+  );
   res.send(state);
 });
 
 app.get("/api/validateSession", (req, res) => {
   if (Object.keys(req).includes("user")) {
-    res.send(req.user);
+    res.send({ user: req.user });
   } else {
-    res.send(undefined);
+    res.send({ user: undefined });
   }
+});
+
+//GET5_APISTATS
+
+app.post("match/:id/map/:map/start", (req, res) => {
+  state.status.status = "LIVE";
+  match.data = req.body;
+  res.send(match);
+});
+
+app.post("match/:id/map/:map/finish", (req, res) => {
+  state.status = "FINISHED";
+  match.data = req.body;
+  res.send(match);
+});
+
+app.post("match/:id/map/:map/update", (req, res) => {
+  match.data = req.body;
+  res.send(match);
 });
 
 function createTeamDTO(team) {
@@ -235,7 +263,6 @@ function createMatch() {
     Object.keys(votedto).reduce((a, b) => (votedto[a] > votedto[b] ? a : b));
 
   const matchConfig = {
-    matchid: "SankariBattle",
     num_maps: 1,
     players_per_team: 5,
     min_players_to_ready: 1,
@@ -256,8 +283,8 @@ function createMatch() {
 
     cvars: {
       hostname: "SankariArena",
-      get5_web_api_url: "167.172.166.236/api/matchState",
-      get5_web_api_key: process.env.STEAM_API_KEY
+      get5_web_api_url: "http://167.172.166.236/api/",
+      get5_web_api_key: "test"
     }
   };
 
@@ -271,6 +298,8 @@ app.get("/api/startGame", (req, res) => {
       .command("quit")
       .then(console.log("RESTART SUCCESS"), console.error("RESTART FAILED"));
   });
+
+  state.status = "PROCESSING";
 
   setTimeout(() => {
     rcon.connect().then(() => {
@@ -286,34 +315,34 @@ app.get("/api/startGame", (req, res) => {
   res.send({ game: "started" });
 });
 
-app.get("/api/getPracMode", (res, req) => {
-  rcon.connect().then(() => {
-    rcon.command("get5_check_auths").then(auths => {
-      auths === 0 ? (state.praccMode = false) : (state.praccMode = true);
-    });
-  });
-  res.send(state.praccMode);
-});
-
-app.get("/api/togglePracMode", (res, req) => {
-  rcon.connect().then(() => {
-    rcon.command("get5_check_auths").then(auths => {
-      auths === 0 ? (state.praccMode = false) : (state.praccMode = true);
-    });
-  });
-
-  rcon.connect().then(() => {
-    const newMode = state.praccMode === 0 ? 1 : 0;
-    rcon
-      .command(`get5_check_auths ${newMode}`)
-      .then(console.log("TOGGLED AUTH REQUIREMENTS"));
-  });
-
-  state.praccMode = newMode === 1 ? true : false;
-  res.send(state.praccMode);
-});
-
 app.get("/api/loadMatchConfig", (req, res) => {
   const matchConfig = createMatch();
   res.send(matchConfig);
 });
+
+// app.get("/api/getPracMode", (res, req) => {
+//   rcon.connect().then(() => {
+//     rcon.command("get5_check_auths").then(auths => {
+//       auths === 0 ? (state.praccMode = false) : (state.praccMode = true);
+//     });
+//   });
+//   res.send(state.praccMode);
+// });
+//
+// app.get("/api/togglePracMode", (res, req) => {
+//   rcon.connect().then(() => {
+//     rcon.command("get5_check_auths").then(auths => {
+//       auths === 0 ? (state.praccMode = false) : (state.praccMode = true);
+//     });
+//   });
+//
+//   rcon.connect().then(() => {
+//     const newMode = state.praccMode === 0 ? 1 : 0;
+//     rcon
+//       .command(`get5_check_auths ${newMode}`)
+//       .then(console.log("TOGGLED AUTH REQUIREMENTS"));
+//   });
+//
+//   state.praccMode = newMode === 1 ? true : false;
+//   res.send(state.praccMode);
+// });
