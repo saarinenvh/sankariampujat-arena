@@ -12,23 +12,20 @@ class HandleTeams extends React.Component {
     super(props);
     this.state = {
       serverData: {
-        user: undefined,
         playerPool: [],
         team1: [],
         team2: []
       },
-
+      user: undefined,
       votes: {},
-      newPlayer: "",
-      endpoint: "http://localhost:5500"
+      endpoint: "http://167.172.166.236:5500/"
     };
   }
 
   async checkIfAuthenticated() {
     let user = await this.getFromBackEndAPI("/api/validateSession");
-    const newState = this.state.serverData;
-    newState.user = user;
-    if (user) this.setState(newState);
+    console.log(user);
+    if (user) this.setState({ user: user.user });
   }
 
   componentDidMount() {
@@ -94,24 +91,6 @@ class HandleTeams extends React.Component {
     const newState = this.state.serverData;
     newState.playerPool = pool;
     this.postToBackEndApi("/api/updateState", newState);
-  }
-
-  createNewPlayer() {
-    const newPlayer = { id: uuidv4(), name: this.state.newPlayer };
-    this.addPlayerToPool(newPlayer);
-  }
-
-  async addPlayerToPool(player) {
-    let pool = this.state.serverData.playerPool;
-    pool.push(player);
-    const newState = this.state.serverData;
-    newState["playerPool"] = pool;
-    await this.postToBackEndApi("/api/updateState", newState);
-    this.setState({ newPlayer: "" });
-  }
-
-  handleChange(event) {
-    this.setState({ newPlayer: event.target.value }, () => {});
   }
 
   async emptyTeams() {
@@ -200,8 +179,8 @@ class HandleTeams extends React.Component {
             <span className="mr-2">{i + 1}.</span>
             {n.displayName}
           </div>
-          {n.id === this.state.serverData.user.id ||
-          this.state.serverData.user.displayName === "vhs" ? (
+          {n.id === this.state.user.id ||
+          this.state.user.displayName === "vhs" ? (
             <div className="col-md-2 float-right">
               <span
                 className="teamNumber link mr-4"
@@ -233,15 +212,10 @@ class HandleTeams extends React.Component {
     }
   }
 
-  handleSubmit(e) {
-    e.preventDefault();
-    this.createNewPlayer();
-  }
-
   render() {
     return (
       <div className="whole">
-        {this.state.serverData.user === undefined ? (
+        {!this.state.user ? (
           <div className="headerContainer mt-5 animate">
             <div className="row ml-2 mr-2">
               <div className="col">
@@ -258,20 +232,20 @@ class HandleTeams extends React.Component {
           </div>
         ) : (
           <div>
-            <div className="main mb-3 animate">
+            <div className="main mb-3 animate players">
               <div className="row ml-2 mr-2">
                 <div className="col">
                   <h1>Player Pool</h1>
                 </div>
                 <div className="col-md-6 pr-0">
                   {!this.state.serverData.playerPool.find(
-                    n => n.id === this.state.serverData.user.id
+                    n => n.id === this.state.user.id
                   ) &&
                   !this.state.serverData.team1.find(
-                    n => n.id === this.state.serverData.user.id
+                    n => n.id === this.state.user.id
                   ) &&
                   !this.state.serverData.team2.find(
-                    n => n.id === this.state.serverData.user.id
+                    n => n.id === this.state.user.id
                   ) ? (
                     <h4
                       onClick={() => {
@@ -328,7 +302,7 @@ class HandleTeams extends React.Component {
               </div>
             </div>
 
-            <div className="main mb-3 animate">
+            <div className="main mb-3 animateDelay teams">
               <div className="teamsSection">
                 <div className="row  ml-2 mr-2">
                   <div className="col">
@@ -371,7 +345,10 @@ class HandleTeams extends React.Component {
               </div>
             </div>
 
-            <div id="mapVoteContainer" className="main mb-3 animate">
+            <div
+              id="mapVoteContainer"
+              className="main mb-3 animateDelayLong maps"
+            >
               <div className="mapVote">
                 <div className="row ml-2 mr-2">
                   <div className="col">

@@ -93,9 +93,31 @@ h4 {
   color: black;
 }
 
+.headerContainer,
+.maps,
+.players,
+.teams {
+  opacity: 0;
+}
+
 .animate {
   animation-name: showSlow;
-  animation-duration: 2s;
+  animation-duration: 1s;
+  animation-fill-mode: forwards;
+}
+
+.animateDelay {
+  animation-name: showSlow;
+  animation-duration: 1s;
+  animation-delay: 0.5s;
+  animation-fill-mode: forwards;
+}
+
+.animateDelayLong {
+  animation-name: showSlow;
+  animation-duration: 1s;
+  animation-delay: 1s;
+  animation-fill-mode: forwards;
 }
 
 @keyframes showSlow {

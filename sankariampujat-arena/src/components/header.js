@@ -16,7 +16,7 @@ class Header extends React.Component {
 
   async checkIfAuthenticated() {
     let user = await this.getFromBackEndAPI("/api/validateSession");
-    this.setState({ user: user.user });
+    this.setState(user);
   }
 
   async signOut() {

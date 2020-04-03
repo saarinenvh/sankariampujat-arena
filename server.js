@@ -127,7 +127,6 @@ app.get(
   passport.authenticate("steam", { failureRedirect: "/" }),
   function(req, res) {
     if (Object.keys(req).includes("user")) {
-      state.user = req.user;
       connectedUsers.push(req.user);
     }
     res.redirect("/");
@@ -150,8 +149,7 @@ app.get("/api/logout", (req, res) => {
   if (state.team2.find(n => n.id === req.user.id))
     state.team2.splice(state.team2.findIndex(n => n.id === req.user.id), 1);
   req.logout();
-  state.user = undefined;
-  res.send(state);
+  res.send({ user: undefined });
 });
 
 //START SERVER
