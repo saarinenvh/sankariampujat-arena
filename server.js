@@ -302,7 +302,7 @@ app.get("/api/startGame", (req, res) => {
   setTimeout(() => {
     rcon.connect().then(() => {
       rcon
-        .command("get5_loadmatch_url 167.172.166.236/api/loagMatchConfig")
+        .command("get5_loadmatch_url 167.172.166.236/api/loadMatchConfig")
         .then(
           console.log("MATCH CONFIG LOADED SUCCESFULLY"),
           console.error("ERROR LOADING MATCH CONFIG")
