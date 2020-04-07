@@ -42,7 +42,7 @@ class GameInSession extends React.Component {
               </div>
             </div>
             <div className="row">
-              <div className="row text-center">
+              <div className="col text-center mt-3">
                 <h5>connect suomi6.net9.fi:27025; password sankariarena</h5>
               </div>
             </div>
