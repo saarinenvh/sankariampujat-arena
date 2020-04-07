@@ -230,22 +230,22 @@ app.get("/api/validateSession", (req, res) => {
 
 //GET5_APISTATS
 
-app.post("match/:id/map/:map/start", (req, res) => {
+app.post("/api/match/:id/map/:map/start", (req, res) => {
   state.status = "LIVE";
-  match.data = req.body;
+  Object.assign(req.body, match.data);
   console.log(state.status);
   res.send(match);
 });
 
-app.post("match/:id/map/:map/finish", (req, res) => {
+app.post("/api/match/:id/map/:map/finish", (req, res) => {
   state.status = "FINISHED";
-  match.data = req.body;
+  Object.assign(req.body, match.data);
   console.log(state.status);
   res.send(match);
 });
 
-app.post("match/:id/map/:map/update", (req, res) => {
-  match.data = req.body;
+app.post("/api/match/:id/map/:map/update", (req, res) => {
+  Object.assign(req.body, match.data);
   res.send(match);
 });
 
