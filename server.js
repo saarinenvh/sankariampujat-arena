@@ -248,13 +248,13 @@ app.get("/api/initNewGame", (req, res) => {
 app.post("/api/match/:id/map/:map/start", (req, res) => {
   state.status = "LIVE";
   Object.assign(req.body, state.data);
-  console.log(state.status);
+  console.log(state.data);
 });
 
 app.post("/api/match/:id/map/:map/finish", (req, res) => {
   state.status = "FINISHED";
   Object.assign(req.body, state.data);
-  console.log(state.status);
+  console.log(state.data);
 });
 
 app.post("/api/match/:id/map/:map/update", (req, res) => {
