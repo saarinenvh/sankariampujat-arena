@@ -10,7 +10,7 @@ class GameInSession extends React.Component {
   }
 
   parentCallback() {
-    return "INIT";
+    this.props.parentCallback("INIT");
   }
 
   render() {

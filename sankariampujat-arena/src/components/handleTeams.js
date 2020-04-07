@@ -111,7 +111,6 @@ class HandleTeams extends React.Component {
   }
 
   shuffleArray(array) {
-    console.log(array);
     let i = array.length;
     while (i--) {
       const ri = Math.floor(Math.random() * (i + 1));
@@ -379,7 +378,7 @@ class HandleTeams extends React.Component {
           </div>
         ) : (
           <GameInSession
-            key={new uuidv4()}
+            key={uuidv4()}
             parentCallback={this.newGame}
             status={this.state.serverData.status}
           ></GameInSession>
