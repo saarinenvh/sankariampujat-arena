@@ -19,18 +19,26 @@ class GameInSession extends React.Component {
         <div className="row animate">
           <div className="col text-center">
             <h2 className="session">Game in is session...</h2>
-            {this.state.status === "FINISHED" ? (
+          </div>
+        </div>
+        {this.state.status === "FINISHED" ? (
+          <div className="row">
+            <div className="col justify-content-center">
               <button
                 onClick={() => this.parentCallback()}
                 className="btn btn-primary"
               >
                 Start New Game!
               </button>
-            ) : (
-              <div></div>
-            )}
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="row">
+            <div className="row text-center">
+              <h4>connect suomi6.net9.fi:27025; password sankariarena</h4>
+            </div>
+          </div>
+        )}
       </div>
     );
   }
