@@ -232,20 +232,20 @@ app.get("/api/validateSession", (req, res) => {
 
 app.post("/api/match/:id/map/:map/start", (req, res) => {
   state.status = "LIVE";
-  Object.assign(req.body, match.data);
+  Object.assign(req.body, state.data);
   console.log(state.status);
   res.send(match);
 });
 
 app.post("/api/match/:id/map/:map/finish", (req, res) => {
   state.status = "FINISHED";
-  Object.assign(req.body, match.data);
+  Object.assign(req.body, state.data);
   console.log(state.status);
   res.send(match);
 });
 
 app.post("/api/match/:id/map/:map/update", (req, res) => {
-  Object.assign(req.body, match.data);
+  Object.assign(req.body, state.data);
   res.send(match);
 });
 
