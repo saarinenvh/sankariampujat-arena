@@ -119,7 +119,7 @@ class HandleTeams extends React.Component {
     return array;
   }
 
-  async newGame(status) {
+  newGame(status) {
     this.getFromBackEndAPI("/api/initNewGame")
       .then(res => this.setState({ serverData: res }), () => {})
       .catch(err => console.log(err));
@@ -151,10 +151,6 @@ class HandleTeams extends React.Component {
     newState.playerPool = [];
     console.log(newState);
     this.postToBackEndApi("/api/updateState", newState);
-  }
-
-  startGame() {
-    this.getFromBackEndAPI("/api/startGame");
   }
 
   handleAuth() {
