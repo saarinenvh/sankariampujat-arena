@@ -229,7 +229,17 @@ app.get("/api/validateSession", (req, res) => {
 });
 
 app.get("/api/initNewGame", (req, res) => {
-  state.status("INIT");
+  state.status = "INIT";
+  state.playerPool = [];
+  state.team1 = [];
+  state.team2 = [];
+  votedto.forEach((item, i) => {
+    item = 0;
+  });
+  votes.forEach((item, i) => {
+    item = [];
+  });
+
   res.send(state);
 });
 
