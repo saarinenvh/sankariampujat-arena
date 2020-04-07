@@ -125,6 +125,10 @@ class HandleTeams extends React.Component {
       .catch(err => console.log(err));
   };
 
+  startGame() {
+    this.getFromBackEndAPI("/api/startGame");
+  }
+
   randomizeTeams() {
     // Empty teams and put them to playerPool
     const newState = JSON.parse(JSON.stringify(this.state.serverData));
