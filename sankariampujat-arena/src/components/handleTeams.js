@@ -379,6 +379,7 @@ class HandleTeams extends React.Component {
           </div>
         ) : (
           <GameInSession
+            key={new uuidv4()}
             parentCallback={this.newGame}
             status={this.state.serverData.status}
           ></GameInSession>

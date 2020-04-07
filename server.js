@@ -231,14 +231,16 @@ app.get("/api/validateSession", (req, res) => {
 //GET5_APISTATS
 
 app.post("match/:id/map/:map/start", (req, res) => {
-  state.status.status = "LIVE";
+  state.status = "LIVE";
   match.data = req.body;
+  console.log(state.status);
   res.send(match);
 });
 
 app.post("match/:id/map/:map/finish", (req, res) => {
   state.status = "FINISHED";
   match.data = req.body;
+  console.log(state.status);
   res.send(match);
 });
 
@@ -292,21 +294,14 @@ function createMatch() {
 app.get("/api/startGame", (req, res) => {
   rcon.connect().then(() => {
     console.log;
-    rcon
-      .command("quit")
-      .then(console.log("RESTART SUCCESS"), console.error("RESTART FAILED"));
+    rcon.command("quit").then(console.log("RESTART SUCCESS"));
   });
-
-  state.status = "PROCESSING";
 
   setTimeout(() => {
     rcon.connect().then(() => {
       rcon
         .command("get5_loadmatch_url 167.172.166.236/api/loadMatchConfig")
-        .then(
-          console.log("MATCH CONFIG LOADED SUCCESFULLY"),
-          console.error("ERROR LOADING MATCH CONFIG")
-        );
+        .then(console.log("MATCH CONFIG LOADED SUCCESFULLY"));
     });
   }, 25000);
   state.status = "ONGOING";
