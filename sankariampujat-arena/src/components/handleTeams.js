@@ -120,8 +120,9 @@ class HandleTeams extends React.Component {
   }
 
   async newGame(status) {
-    const newState = await this.getFromBackEndAPI("/api/initNewGame");
-    this.setState(newState);
+    this.getFromBackEndAPI("/api/initNewGame")
+      .then(res => this.setState({ serverData: res }), () => {})
+      .catch(err => console.log(err));
   }
 
   randomizeTeams() {
