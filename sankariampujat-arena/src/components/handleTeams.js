@@ -119,11 +119,11 @@ class HandleTeams extends React.Component {
     return array;
   }
 
-  newGame(status) {
+  newGame = e => {
     this.getFromBackEndAPI("/api/initNewGame")
       .then(res => this.setState({ serverData: res }), () => {})
       .catch(err => console.log(err));
-  }
+  };
 
   randomizeTeams() {
     // Empty teams and put them to playerPool
