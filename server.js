@@ -228,6 +228,11 @@ app.get("/api/validateSession", (req, res) => {
   }
 });
 
+app.get("/api/initNewGame", (req, res) => {
+  state.status("INIT");
+  res.send(state);
+});
+
 //GET5_APISTATS
 
 app.post("/api/match/:id/map/:map/start", (req, res) => {

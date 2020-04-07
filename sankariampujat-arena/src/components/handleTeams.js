@@ -119,9 +119,8 @@ class HandleTeams extends React.Component {
     return array;
   }
 
-  newGame(status) {
-    const newState = this.state;
-    newState.serverData.status = status;
+  async newGame(status) {
+    const newState = await this.getFromBackEndAPI("/api/initNewGame");
     this.setState(newState);
   }
 
