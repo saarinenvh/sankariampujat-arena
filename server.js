@@ -309,7 +309,7 @@ app.get("/api/startGame", (req, res) => {
         );
     });
   }, 25000);
-
+  state.status = "ONGOING";
   res.send(state);
 });
 

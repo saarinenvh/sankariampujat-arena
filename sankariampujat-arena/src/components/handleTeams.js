@@ -1,6 +1,7 @@
 import React from "react";
 import Team from "./team";
 import MapVote from "./mapVote";
+import GameInSession from "./gameInSession";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import { faUserPlus } from "@fortawesome/free-solid-svg-icons";
@@ -12,6 +13,7 @@ class HandleTeams extends React.Component {
     super(props);
     this.state = {
       serverData: {
+        status: "INIT",
         playerPool: [],
         team1: [],
         team2: []
@@ -24,7 +26,6 @@ class HandleTeams extends React.Component {
 
   async checkIfAuthenticated() {
     let user = await this.getFromBackEndAPI("/api/validateSession");
-    console.log(user);
     if (user) this.setState({ user: user.user });
   }
 
@@ -117,6 +118,12 @@ class HandleTeams extends React.Component {
       [array[i], array[ri]] = [array[ri], array[i]];
     }
     return array;
+  }
+
+  newGame(status) {
+    const newState = this.state;
+    newState.serverData.status = status;
+    this.setState(newState);
   }
 
   randomizeTeams() {
@@ -230,7 +237,7 @@ class HandleTeams extends React.Component {
               </div>
             </div>
           </div>
-        ) : (
+        ) : this.state.serverData.status === "INIT" ? (
           <div>
             <div className="main mb-3 animate players">
               <div className="row ml-2 mr-2">
@@ -370,6 +377,11 @@ class HandleTeams extends React.Component {
               </div>
             </div>
           </div>
+        ) : (
+          <GameInSession
+            parentCallback={this.newGame}
+            status={this.state.serverData.status}
+          ></GameInSession>
         )}
       </div>
     );

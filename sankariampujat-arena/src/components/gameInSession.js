@@ -4,8 +4,35 @@ class GameInSession extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      user: undefined
+      status: this.props.status,
+      user: this.props.user
     };
+  }
+
+  parentCallback() {
+    return "INIT";
+  }
+
+  render() {
+    return (
+      <div className="main">
+        <div className="row animate">
+          <div className="col text-center">
+            <h2 className="session">Game in is session...</h2>
+            {this.state.status === "FINISHED" ? (
+              <button
+                onClick={() => this.parentCallback()}
+                className="btn btn-primary"
+              >
+                Start New Game!
+              </button>
+            ) : (
+              <div></div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
   }
 }
 

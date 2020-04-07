@@ -21,8 +21,7 @@ class Header extends React.Component {
 
   async signOut() {
     await this.getFromBackEndAPI("/api/logout");
-    const auth = await this.checkIfAuthenticated();
-    this.setState({ user: auth.user });
+    this.setState({ user: undefined });
   }
 
   getFromBackEndAPI = async url => {
