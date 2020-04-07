@@ -233,11 +233,11 @@ app.get("/api/initNewGame", (req, res) => {
   state.playerPool = [];
   state.team1 = [];
   state.team2 = [];
-  votedto.forEach((item, i) => {
-    item = 0;
+  Object.keys(votedto).forEach((item, i) => {
+    votedto[item] = 0;
   });
-  votes.forEach((item, i) => {
-    item = [];
+  Object.keys(votes).forEach((item, i) => {
+    votes[item] = [];
   });
 
   res.send(state);

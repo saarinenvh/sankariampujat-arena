@@ -16,26 +16,35 @@ class GameInSession extends React.Component {
   render() {
     return (
       <div className="main">
-        <div className="row animate">
-          <div className="col text-center">
-            <h2 className="session">Game in is session...</h2>
-          </div>
-        </div>
         {this.state.status === "FINISHED" ? (
-          <div className="row">
-            <div className="col justify-content-center">
-              <button
-                onClick={() => this.parentCallback()}
-                className="btn btn-primary"
-              >
-                Start New Game!
-              </button>
+          <div>
+            <div className="row">
+              <div className="col text-center">
+                <h2 className="session">Game Finished!</h2>
+              </div>
+            </div>
+            <div className="row">
+              <div className="col justify-content-center">
+                <button
+                  onClick={() => this.parentCallback()}
+                  className="btn btn-primary"
+                >
+                  Start New Game!
+                </button>
+              </div>
             </div>
           </div>
         ) : (
-          <div className="row">
-            <div className="row text-center">
-              <h4>connect suomi6.net9.fi:27025; password sankariarena</h4>
+          <div className="gameinsession">
+            <div className="row animate">
+              <div className="col text-center">
+                <h2 className="session">Game in is session...</h2>
+              </div>
+            </div>
+            <div className="row">
+              <div className="row text-center">
+                <h5>connect suomi6.net9.fi:27025; password sankariarena</h5>
+              </div>
             </div>
           </div>
         )}
