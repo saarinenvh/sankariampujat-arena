@@ -6,6 +6,7 @@ import train from "../files/train.png";
 import overpass from "../files/overpass.png";
 import nuke from "../files/nuke.jpg";
 import vertigo from "../files/vertigo.jpg";
+import mirage from "../files/mirage.jpg";
 
 class MapVote extends React.Component {
   constructor(props) {
@@ -138,6 +139,18 @@ class MapVote extends React.Component {
               alt="Vertigo"
             ></img>
             <h5 className="mt-1">Votes: {this.state.votes.vertigo}</h5>
+          </div>
+          <div className="col-md-3 justify-content-center text-center">
+            <h5>Mirage</h5>
+            <img
+              onClick={() => this.handleVote("mirage")}
+              className="mapThumbnail"
+              src={mirage}
+              height="150"
+              width="150"
+              alt="Vertigo"
+            ></img>
+            <h5 className="mt-1">Votes: {this.state.votes.mirage}</h5>
           </div>
         </div>
         <div className="row mt-2">
