@@ -9,6 +9,12 @@ class GameInSession extends React.Component {
     };
   }
 
+  componentDidMount() {
+    setTimeout(() => {
+      this.setState({ status: "ONGOING" });
+    }, 30000);
+  }
+
   parentCallback() {
     this.props.parentCallback("INIT");
   }
@@ -36,16 +42,26 @@ class GameInSession extends React.Component {
           </div>
         ) : (
           <div className="gameinsession">
-            <div className="row animate">
-              <div className="col text-center">
-                <h2 className="session">Game in is session...</h2>
+            {this.state.status === "STARTING" ? (
+              <div className="row animate">
+                <div className="col text-center">
+                  <h2 className="session">Configuring server...</h2>
+                </div>
               </div>
-            </div>
-            <div className="row">
-              <div className="col text-center mt-3">
-                <h5>connect suomi6.net9.fi:27025; password sankariarena</h5>
+            ) : (
+              <div>
+                <div className="row animate">
+                  <div className="col text-center">
+                    <h2 className="session">Game Started!</h2>
+                  </div>
+                </div>
+                <div className="row">
+                  <div className="col text-center mt-3">
+                    <h5>connect suomi6.net9.fi:27025; password sankariarena</h5>
+                  </div>
+                </div>
               </div>
-            </div>
+            )}
           </div>
         )}
       </div>

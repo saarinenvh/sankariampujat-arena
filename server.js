@@ -272,6 +272,12 @@ app.post("/api/match/:id/map/:map/finish", (req, res) => {
   console.log(req);
   Object.assign(req.body, state.data);
   console.log(state.data);
+  try {
+    res.send(state);
+    io.sockets.emit("STATE", state); // Emitting a new message. It will be consumed by the client
+  } catch (error) {
+    console.error(`Error: ${error.code}`);
+  }
 });
 
 app.post("/api/match/:id/map/:map/update", (req, res) => {
@@ -334,8 +340,13 @@ app.get("/api/startGame", (req, res) => {
         .then(console.log("MATCH CONFIG LOADED SUCCESFULLY"));
     });
   }, 25000);
-  state.status = "ONGOING";
-  res.send(state);
+  state.status = "STARTING";
+  try {
+    res.send(state);
+    io.sockets.emit("STATE", state); // Emitting a new message. It will be consumed by the client
+  } catch (error) {
+    console.error(`Error: ${error.code}`);
+  }
 });
 
 app.get("/api/loadMatchConfig", (req, res) => {
