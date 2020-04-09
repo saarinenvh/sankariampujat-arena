@@ -153,7 +153,7 @@ class HandleTeams extends React.Component {
     );
     newState.team2 = newState.playerPool;
     newState.playerPool = [];
-    console.log(newState);
+
     this.postToBackEndApi("/api/updateState", newState);
   }
 

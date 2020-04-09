@@ -56,6 +56,7 @@ let votes = {
 let connection = mysql.createConnection({
   host: process.env.DB_HOST, // eslint-disable-line
   user: process.env.DB_USERNAME, // eslint-disable-line
+  port: process.env.DB_PORT,
   password: process.env.DB_PASSWORD, // eslint-disable-line
   database: process.env.DB_NAME // eslint-disable-line
 });
@@ -157,23 +158,6 @@ const server = app.listen(port, () => console.log(`Listening on port ${port}`));
 
 // HANDLING SOCKET
 const io = socketIo(server, { "force new connection": true });
-let interval;
-
-io.sockets.on("connection", socket => {
-  if (interval) {
-    clearInterval(interval);
-  }
-  interval = setInterval(() => getApiAndEmit(socket), 1000);
-});
-
-const getApiAndEmit = async socket => {
-  try {
-    io.sockets.emit("STATE", state); // Emitting a new message. It will be consumed by the client
-    io.sockets.emit("VOTES", votedto); // Emitting a new message. It will be consumed by the client
-  } catch (error) {
-    console.error(`Error: ${error.code}`);
-  }
-};
 
 // API FOR HANDLING FRONT
 app.get("/api/getVotes", (req, res) => {
@@ -193,23 +177,44 @@ app.post("/api/updateVotes", (req, res) => {
 
   votes[req.body.map].push(req.user.id);
   Object.keys(votes).forEach(n => (votedto[n] = votes[n].length));
-  res.send(votedto);
+  try {
+    res.send(votedto);
+    io.sockets.emit("VOTES", votedto); // Emitting a new message. It will be consumed by the client
+  } catch (error) {
+    console.error(`Error: ${error.code}`);
+  }
 });
 
 app.get("/api/clearVotes", (req, res) => {
   Object.keys(votes).forEach(n => (votes[n] = []));
   Object.keys(votedto).forEach(n => (votedto[n] = 0));
-  res.send(votedto);
+  try {
+    res.send(votedto);
+    io.sockets.emit("VOTES", votedto); // Emitting a new message. It will be consumed by the client
+  } catch (error) {
+    console.error(`Error: ${error.code}`);
+  }
 });
 
 app.post("/api/updateState", (req, res) => {
   state = req.body;
-  res.send(state);
+  try {
+    res.send(state);
+    io.sockets.emit("STATE", state); // Emitting a new message. It will be consumed by the client
+  } catch (error) {
+    console.error(`Error: ${error.code}`);
+  }
 });
 
 app.get("/api/joinToPlayerPool", (req, res) => {
   state.playerPool.push(req.user);
-  res.send(state);
+
+  try {
+    res.send(state);
+    io.sockets.emit("STATE", state); // Emitting a new message. It will be consumed by the client
+  } catch (error) {
+    console.error(`Error: ${error.code}`);
+  }
 });
 
 app.get("/api/leavePlayerPool", (req, res) => {
@@ -217,7 +222,13 @@ app.get("/api/leavePlayerPool", (req, res) => {
     state.playerPool.findIndex(n => n.id == req.user.id),
     1
   );
-  res.send(state);
+
+  try {
+    res.send(state);
+    io.sockets.emit("STATE", state); // Emitting a new message. It will be consumed by the client
+  } catch (error) {
+    console.error(`Error: ${error.code}`);
+  }
 });
 
 app.get("/api/validateSession", (req, res) => {
@@ -240,24 +251,31 @@ app.get("/api/initNewGame", (req, res) => {
     votes[item] = [];
   });
 
-  res.send(state);
+  try {
+    io.sockets.emit("STATE", state); // Emitting a new message. It will be consumed by the client
+  } catch (error) {
+    console.error(`Error: ${error.code}`);
+  }
 });
 
 //GET5_APISTATS
 
 app.post("/api/match/:id/map/:map/start", (req, res) => {
   state.status = "LIVE";
+  console.log(req);
   Object.assign(req.body, state.data);
   console.log(state.data);
 });
 
 app.post("/api/match/:id/map/:map/finish", (req, res) => {
   state.status = "FINISHED";
+  console.log(req);
   Object.assign(req.body, state.data);
   console.log(state.data);
 });
 
 app.post("/api/match/:id/map/:map/update", (req, res) => {
+  console.log(req);
   Object.assign(req.body, state.data);
 });
 
@@ -350,4 +368,60 @@ app.get("/api/loadMatchConfig", (req, res) => {
 //
 //   state.praccMode = newMode === 1 ? true : false;
 //   res.send(state.praccMode);
+// });
+
+// API FOR MYSQL
+
+// async function fetchPlayersMatches(steamId) {
+//   let data = await new Promise((res, rej) => {
+//     mysql.query(
+//       `SELECT * FROM get5_stats_players JOIN get5_stats_matches on get5_stats_players.matchid = get5_stats_matches.matchid where get5_stats_players.steamid64 = ${steamid64}`,
+//       function(error, results, fields) {
+//         if (error) {
+//           Logger.info(error);
+//         } else {
+//           res(results);
+//         }
+//       }
+//     );
+//   });
+//   return JSON.parse(JSON.stringify(data));
+// }
+//
+// async function fetchMatchStats(matchId) {
+//   let data = await new Promise((res, rej) => {
+//     mysql.query(
+//       `SELECT * FROM get5_stats_players WHERE matchid = ${matchId}`,
+//       function(error, results, fields) {
+//         if (error) {
+//           Logger.info(error);
+//         } else {
+//           res(results);
+//         }
+//       }
+//     );
+//   });
+//   return JSON.parse(JSON.stringify(data));
+// }
+//
+// async function fetchPlayerOverallStatistics(steamid64) {
+//   let data = await new Promise((res, rej) => {
+//     mysql.query(
+//       `SELECT * FROM get5_stats_players JOIN get5_stats_matches on get5_stats_players.matchid = get5_stats_matches.matchid where get5_stats_players.steamid64 = ${steamid64}`,
+//       function(error, results, fields) {
+//         if (error) {
+//           Logger.info(error);
+//         } else {
+//           res(results);
+//         }
+//       }
+//     );
+//   });
+//   return JSON.parse(JSON.stringify(data));
+// }
+//
+// app.get("/api/getPlayerMatches/:id", async (req, res) => {
+//   const steamId = req.params.id;
+//   data = await fetchPlayersMatches(steamId);
+//   res.send(data);
 // });
