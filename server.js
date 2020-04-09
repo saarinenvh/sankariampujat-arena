@@ -339,7 +339,7 @@ app.get("/api/startGame", (req, res) => {
         .command("get5_loadmatch_url 167.172.166.236/api/loadMatchConfig")
         .then(console.log("MATCH CONFIG LOADED SUCCESFULLY"));
     });
-  }, 25000);
+  }, 30000);
   state.status = "STARTING";
   try {
     res.send(state);
