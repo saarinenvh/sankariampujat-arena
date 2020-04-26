@@ -272,6 +272,10 @@ app.post("/api/match/:id/map/:map/finish", (req, res) => {
   console.log(req);
   Object.assign(req.body, state.data);
   console.log(state.data);
+  rcon.connect().then(() => {
+    console.log;
+    rcon.command("quit").then(console.log("RESTART SUCCESS"));
+  });
   try {
     res.send(state);
     io.sockets.emit("STATE", state); // Emitting a new message. It will be consumed by the client
@@ -328,11 +332,6 @@ function createMatch() {
 }
 
 app.get("/api/startGame", (req, res) => {
-  rcon.connect().then(() => {
-    console.log;
-    rcon.command("quit").then(console.log("RESTART SUCCESS"));
-  });
-
   setTimeout(() => {
     rcon.connect().then(() => {
       rcon
